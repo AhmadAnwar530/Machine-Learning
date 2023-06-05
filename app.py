@@ -2,16 +2,16 @@ from flask import Flask, render_template, request
 import pandas as pd
 import numpy as np
 import pickle
-from sklearn.feature_extraction.text import CountVectorizer
+from prettytable import PrettyTable
+from sklearn.preprocessing import LabelEncoder
 
 app = Flask(__name__)
 
-# Load the trained machine learning model
+# Load the trained machine learning models
 with open('./model/logistic_trained_model.pkl', 'rb') as f:
     logistic_trained_model = pickle.load(f)
 with open('./model/logistic_k_model.pkl', 'rb') as f:
     logistic_k_model = pickle.load(f)
-
 with open('./model/rfc_trained_model.pkl', 'rb') as f:
     rfc_trained_model = pickle.load(f)
 with open('./model/rf_k_model.pkl', 'rb') as f:
@@ -60,9 +60,9 @@ with open('./model/lda_trained_model.pkl', 'rb') as f:
 with open('./model/lda_k_model.pkl', 'rb') as f:
     lda_k_model = pickle.load(f)
 
-# Load the vectorizer
-with open('./vectorizer.pkl', 'rb') as f:
-    vectorizer = pickle.load(f)
+
+# Create LabelEncoder object for categorical feature encoding
+label_encoder = LabelEncoder()
 
 
 @app.route('/')
@@ -70,65 +70,101 @@ def home():
     return render_template('prediction.html')
 
 
-@app.route('/prediction', methods=['POST', 'GET'])
-def prediction():
-    if request.method == 'POST':
-        # Get the form data
-        Loan_Status = request.form.get('Loan_Status')
-        split = request.form.get('split')
-        model1 = request.form.get('model')
-        if Loan_Status is not None:
-            # Vectorize the text using the loaded vectorizer
-            Loan_Status_vectorized = vectorizer.transform([Loan_Status.lower()])
-            predicted_label = None
+@app.route('/predict', methods=['POST'])
+def predict():
+    # Take input from the HTML form
+    gender_input = request.form['gender']
+    married_input = request.form['married']
+    dependents_input = request.form['dependents']
+    education_input = request.form['education']
+    self_employed_input = request.form['self_employed']
+    income_input = request.form['income']
+    coapplicant_input = request.form['coapplicant']
+    loan_amount_input = request.form['loan_amount']
+    loan_amount_term_input = request.form['loan_amount_term']
+    credit_input = request.form['credit']
+    property_area_input = request.form['property_area']
 
-            # Make a prediction using the loaded model
-            if split == 'Train_Test' and model1 == 'Logistic_Regression':
-                predicted_label = logistic_trained_model.predict(Loan_Status_vectorized)
-            elif split == 'KFold' and model1 == 'Logistic_Regression':
-                predicted_label = logistic_k_model.predict(Loan_Status_vectorized)
-            elif split == 'Train_Test' and model1 == 'Random_Forest':
-                predicted_label = rfc_trained_model.predict(Loan_Status_vectorized)
-            elif split == 'KFold' and model1 == 'Random_Forest':
-                predicted_label = rf_k_model.predict(Loan_Status_vectorized)
-            elif split == 'Train_Test' and model1 == 'Naive_Bayes':
-                predicted_label = naive_bayes_trained_model.predict(Loan_Status_vectorized)
-            elif split == 'KFold' and model1 == 'Naive_Bayes':
-                predicted_label = nb_k_model.predict(Loan_Status_vectorized)
-            elif split == 'Train_Test' and model1 == 'Decision_Tree':
-                predicted_label = dtc_trained_model.predict(Loan_Status_vectorized)
-            elif split == 'KFold' and model1 == 'Decision_Tree':
-                predicted_label = dt_k_model.predict(Loan_Status_vectorized)
-            elif split == 'Train_Test' and model1 == 'Support_Vector':
-                predicted_label = svc_trained_model.predict(Loan_Status_vectorized)
-            elif split == 'KFold' and model1 == 'Support_Vector':
-                predicted_label = svm_k_model.predict(Loan_Status_vectorized)
-            elif split == 'Train_Test' and model1 == 'XGradientBoost':
-                predicted_label = xgb_trained_model.predict(Loan_Status_vectorized)
-            elif split == 'KFold' and model1 == 'XGradientBoost':
-                predicted_label = xgb_k_model.predict(Loan_Status_vectorized)
-            elif split == 'Train_Test' and model1 == 'KNN':
-                predicted_label = knn_trained_model.predict(Loan_Status_vectorized)
-            elif split == 'KFold' and model1 == 'KNN':
-                predicted_label = knn_k_model.predict(Loan_Status_vectorized)
-            elif split == 'Train_Test' and model1 == 'Ada_Boost':
-                predicted_label = ada_trained_model.predict(Loan_Status_vectorized)
-            elif split == 'KFold' and model1 == 'Ada_Boost':
-                predicted_label = ada_boost_k_model.predict(Loan_Status_vectorized)
-            elif split == 'Train_Test' and model1 == 'QDA':
-                predicted_label = qda_trained_model.predict(Loan_Status_vectorized)
-            elif split == 'KFold' and model1 == 'QDA':
-                predicted_label = qda_k_model.predict(Loan_Status_vectorized)
-            elif split == 'Train_Test' and model1 == 'Linear_Discriminant_Analysis':
-                predicted_label = lda_trained_model.predict(Loan_Status_vectorized)
-            elif split == 'KFold' and model1 == 'Linear_Discriminant_Analysis':
-                predicted_label = lda_k_model.predict(Loan_Status_vectorized)
-            else:
-                predicted_label = ['Invalid Input']
+    # Convert user input into feature vector
+    user_input = pd.DataFrame({
+        'Gender': [gender_input],
+        'Married': [married_input],
+        'Dependents': [dependents_input],
+        'Education': [education_input],
+        'Self_Employed': [self_employed_input],
+        'ApplicantIncome': [income_input],
+        'CoapplicantIncome': [coapplicant_input],
+        'LoanAmount': [loan_amount_input],
+        'Loan_Amount_Term': [loan_amount_term_input],
+        'Credit_History': [credit_input],
+        'Property_Area': [property_area_input]
+    })
 
-            print(predicted_label[0])
-            return render_template('prediction.html', Loan_Status=Loan_Status, prediction=predicted_label[0], split=split, model=model1)
-    return render_template('prediction.html')
+    # Encode categorical features
+    user_input['Gender'] = label_encoder.fit_transform(user_input['Gender'])
+    user_input['Married'] = label_encoder.fit_transform(user_input['Married'])
+    user_input['Dependents'] = label_encoder.fit_transform(user_input['Dependents'])
+    user_input['Education'] = label_encoder.fit_transform(user_input['Education'])
+    user_input['Self_Employed'] = label_encoder.fit_transform(user_input['Self_Employed'])
+    user_input['Property_Area'] = label_encoder.fit_transform(user_input['Property_Area'])
+
+    predicted_loan_status = None
+    # Make a prediction using the selected model
+    
+    split = request.form.get('split')
+    model1 = request.form.get('model')
+    
+
+    if split == 'Train_Test' and model1 == 'Logistic_Regression':
+        predicted_loan_status = logistic_trained_model.predict(user_input)
+    elif split == 'KFold' and model1 == 'Logistic_Regression':
+        predicted_loan_status = logistic_k_model.predict(user_input)
+    elif split == 'Train_Test' and model1 == 'Random_Forest':
+            predicted_loan_status = rfc_trained_model.predict(user_input)
+    elif split == 'KFold' and model1 == 'Random_Forest':
+            predicted_loan_status = rf_k_model.predict(user_input)
+    elif split == 'Train_Test' and model1 == 'Naive_Bayes':
+            predicted_loan_status = naive_bayes_trained_model.predict(user_input)
+    elif split == 'KFold' and model1 == 'Naive_Bayes':
+            predicted_loan_status = nb_k_model.predict(user_input)
+    elif split == 'Train_Test' and model1 == 'Decision_Tree':
+            predicted_loan_status = dtc_trained_model.predict(user_input)
+    elif split == 'KFold' and model1 == 'Decision_Tree':
+            predicted_loan_status = dt_k_model.predict(user_input)
+    elif split == 'Train_Test' and model1 == 'Support_Vector':
+            predicted_loan_status = svc_trained_model.predict(user_input)
+    elif split == 'KFold' and model1 == 'Support_Vector':
+            predicted_loan_status = svm_k_model.predict(user_input)
+    elif split == 'Train_Test' and model1 == 'XGradientBoost':
+            predicted_loan_status = xgb_trained_model.predict(user_input)
+    elif split == 'KFold' and model1 == 'XGradientBoost':
+            predicted_loan_status = xgb_k_model.predict(user_input)
+    elif split == 'Train_Test' and model1 == 'KNN':
+            predicted_loan_status = knn_trained_model.predict(user_input)
+    elif split == 'KFold' and model1 == 'KNN':
+            predicted_loan_status = knn_k_model.predict(user_input)
+    elif split == 'Train_Test' and model1 == 'Ada_Boost':
+            predicted_loan_status = ada_trained_model.predict(user_input)
+    elif split == 'KFold' and model1 == 'Ada_Boost':
+            predicted_loan_status = ada_boost_k_model.predict(user_input)
+    elif split == 'Train_Test' and model1 == 'QDA':
+            predicted_loan_status = qda_trained_model.predict(user_input)
+    elif split == 'KFold' and model1 == 'QDA':
+            predicted_loan_status = qda_k_model.predict(user_input)
+    elif split == 'Train_Test' and model1 == 'Linear_Discriminant_Analysis':
+            predicted_loan_status = lda_trained_model.predict(user_input)
+    elif split == 'KFold' and model1 == 'Linear_Discriminant_Analysis':
+            predicted_loan_status = lda_k_model.predict(user_input)
+                
+    if predicted_loan_status is not None:
+        if predicted_loan_status == 1:
+            prediction = "Approved"
+        else:
+            prediction = "NOT Approved"
+    else:
+        prediction = "No prediction available"
+    return render_template('prediction.html', prediction=prediction, split=split, model=model1)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
