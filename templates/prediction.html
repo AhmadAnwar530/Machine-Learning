@@ -1,0 +1,194 @@
+  <!DOCTYPE html>
+  <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <!-- <link href="./prediction.css" rel="stylesheet" /> -->
+      <link
+        rel="stylesheet"
+        href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      />
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+      <!-- <script src="./prediction.js"></script> -->
+      <script src="https://pyodide-cdn2.iodide.io/v0.15.0/full/pyodide.js"></script>
+
+      <style>
+         *{
+            color: black;
+         }
+
+        #center {
+          padding-top: 2rem;
+          height: 100vh;
+          border-top: 1px solid white;
+          /* background: linear-gradient(to right, #f0463a, #e04b4b, #c23131); */
+        }
+
+        body {
+          background-image: url("./wallpaperflare.com_wallpaper.jpg");
+          background-position: fixed;
+          background-repeat: none;
+          background-size: cover;
+        }
+
+        .form-check{
+          width: 40%;
+          margin: auto;
+        }
+
+        .form-select {
+          width: 20%;
+          height: 50%;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          margin-top: 5px;
+          padding: 5px;
+        }
+      </style>
+      <title>LPS</title>
+    </head>
+    <body>
+      <div class="container-fluid">
+        <h1 class="text-center text-white p-4">Loan Prediction System</h1>
+        <div class="container-fluid">
+          <p class="text-light text-center">
+            The goal of <em>Loan Prediction System</em> project is to predict whether
+            to approve a loan or not by considering necessary information about person.
+          </p>
+        </div>
+        <div class="container-fluid pb-4 mb-4">
+        </div>
+      </div>
+      <div class="container-fluid d-flex">
+        <div id="center" class="container-fluid">
+          <form class="form-check" action="/prediction" method="POST">
+            <div class="form-group">
+              <textarea
+                class="form-control mb-3"
+                id="exampleFormControlTextarea1"
+                rows="1"
+                placeholder="Enter Gender [Male,Female]"
+                name="Gender"
+              ></textarea>
+              <textarea
+              class="form-control mb-3"
+              id="exampleFormControlTextarea1"
+              rows="1"
+              placeholder="Enter Marriage Status [Yes,No]"
+              name="Married"
+            ></textarea>
+            <textarea
+            class="form-control mb-3"
+            id="exampleFormControlTextarea1"
+            rows="1"
+            placeholder="Enter Number of Dependants 0,1,2,3[3 or more]"
+            name="Dependents"
+          ></textarea>
+          <textarea
+            class="form-control mb-3"
+            id="exampleFormControlTextarea1"
+            rows="1"
+            placeholder="Enter Education [Graduate or Not Graduate]"
+            name="Education"
+          ></textarea>
+          <textarea
+            class="form-control mb-3"
+            id="exampleFormControlTextarea1"
+            rows="1"
+            placeholder="Enter Self_Employed [Yes,No]"
+            name="Self_Employed"
+          ></textarea>
+          <textarea
+            class="form-control mb-3"
+            id="exampleFormControlTextarea1"
+            rows="1"
+            placeholder="Enter ApplicantIncome"
+            name="ApplicantIncome"
+          ></textarea>
+          <textarea
+            class="form-control mb-3"
+            id="exampleFormControlTextarea1"
+            rows="1"
+            placeholder="Enter CoapplicantIncome"
+            name="CoapplicantIncome"
+          ></textarea>
+          <textarea
+            class="form-control mb-3"
+            id="exampleFormControlTextarea1"
+            rows="1"
+            placeholder="Enter LoanAmount"
+            name="LoanAmount"
+          ></textarea>
+          <textarea
+            class="form-control mb-3"
+            id="exampleFormControlTextarea1"
+            rows="1"
+            placeholder="Enter Loan_Amount_Term"
+            name="Loan_Amount_Term"
+          ></textarea>
+          <textarea
+            class="form-control mb-3"
+            id="exampleFormControlTextarea1"
+            rows="1"
+            placeholder="Enter Credit_History [0=,1=Good]"
+            name="Credit_History"
+          ></textarea>
+          <textarea
+            class="form-control mb-3"
+            id="exampleFormControlTextarea1"
+            rows="1"
+            placeholder="Enter Property_Area [Urban,Rural,Semi-Urban]"
+            name="Property_Area"
+          ></textarea>
+
+              <select
+                class="form-select form-select-lg mb-3"
+                aria-label=".form-select-lg example"
+                id="spsplit-select"
+                name="split"
+              >
+                <option selected>Select the data split approach</option>
+                <option value="KFold">KFold</option>
+                <option value="Train_Test">Train Test Split</option>
+              </select>
+              <select
+                class="form-select form-select-lg mb-3"
+                aria-label=".form-select-lg example"
+                id="model-select"
+                name="model"
+              >
+                <option selected>Select your desired model</option>
+                <option value="Logistic_Regression">Logistic Regression</option>
+                <option value="Random_Forest">Random Forest</option>
+                <option value="Naive_Bayes">Naive Bayes</option>
+                <option value="Decision_Tree">Decision Tree Classifier</option>
+                <option value="Support_Vector">Support Vector Machine</option>
+                <option value="XGradientBoost">
+                  XGradientBoost
+                </option>
+                <option value="KNN">KNN</option>
+                <option value="Ada_Boost">Adaboost Classifier</option>
+                <option value="QDA">Quadratic Discriminant Analysis (QDA)</option>
+                <option value="Linear_Discriminant_Analysis">Linear Discriminant Analysis (LDA)</option>
+              </select>
+            </div>
+            <button
+              type="submit"
+              id="predict"
+              onsubmit="showDiv()"
+              class="btn btn-primary"
+            > 
+              Check Status
+            </button>
+          </form>
+
+          <div id="result" class="container-fluid text-light mt-4">
+            <h2>Prediction Result</h2>
+            <p><b>The prediction is:</b> {{ prediction }}</p>
+          </div>
+        </div>
+      </div>
+    </body>
+  </html>
