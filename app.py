@@ -5,7 +5,7 @@ import pickle
 from prettytable import PrettyTable
 from sklearn.preprocessing import LabelEncoder
 
-app = Flask(__name__)
+app = Flask(__name__,static_url_path='/static')
 
 # Load the trained machine learning models
 with open('./model/logistic_trained_model.pkl', 'rb') as f:
@@ -158,7 +158,7 @@ def predict():
                 
     if predicted_loan_status is not None:
         if predicted_loan_status == 1:
-            prediction = "Approved"
+            prediction = "Alhumdulilah Approved"
         else:
             prediction = "NOT Approved"
     else:

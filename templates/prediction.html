@@ -4,33 +4,35 @@
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="prediction.css">
   <link
     rel="stylesheet"
     href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
   />
   <style>
-    * {
-      color: black;
+    *{
+      font-family: sans-serif;
+      background-color: black;
     }
-
+  
     #center {
       padding-top: 2rem;
       height: 100vh;
       border-top: 1px solid white;
     }
-
+  
     body {
-      background-image: url("./wallpaperflare.com_wallpaper.jpg");
+      background-image: url("./static/wallpaperflare.com_wallpaper.jpg");
       background-position: fixed;
       background-repeat: none;
       background-size: cover;
     }
-
+  
     .form-check {
       width: 40%;
       margin: auto;
     }
-
+  
     .form-select {
       width: 20%;
       height: 50%;
@@ -137,32 +139,34 @@
           />
 
           <select
+          style="background-color: white;"
             class="form-select form-select-lg mb-3"
             aria-label=".form-select-lg example"
             id="split-select"
             name="split"
           >
-            <option selected>Select the data split approach</option>
-            <option value="KFold">KFold</option>
-            <option value="Train_Test">Train Test Split</option>
+            <option style="background-color: white;" selected>Select the data split approach</option>
+            <option style="background-color: white;" value="KFold">KFold</option>
+            <option style="background-color: white;" value="Train_Test">Train Test Split</option>
           </select>
           <select
+            style="background-color: white;"
             class="form-select form-select-lg mb-3"
             aria-label=".form-select-lg example"
             id="model-select"
             name="model"
           >
-            <option selected>Select your desired model</option>
-            <option value="Logistic_Regression">Logistic Regression</option>
-            <option value="Random_Forest">Random Forest</option>
-            <option value="Naive_Bayes">Naive Bayes</option>
-            <option value="Decision_Tree">Decision Tree Classifier</option>
-            <option value="Support_Vector">Support Vector Machine</option>
-            <option value="XGradientBoost">XGradientBoost</option>
-            <option value="KNN">KNN</option>
-            <option value="Ada_Boost">Adaboost Classifier</option>
-            <option value="QDA">Quadratic Discriminant Analysis (QDA)</option>
-            <option value="Linear_Discriminant_Analysis">Linear Discriminant Analysis (LDA)</option>
+            <option selected style="background-color: white;">Select your desired model</option>
+            <option style="background-color: white;" value="Logistic_Regression">Logistic Regression</option>
+            <option style="background-color: white;" value="Random_Forest">Random Forest</option>
+            <option style="background-color: white;" value="Naive_Bayes">Naive Bayes</option>
+            <option style="background-color: white;" value="Decision_Tree">Decision Tree Classifier</option>
+            <option style="background-color: white;" value="Support_Vector">Support Vector Machine</option>
+            <option style="background-color: white;" value="XGradientBoost">XGradientBoost</option>
+            <option style="background-color: white;" value="KNN">KNN</option>
+            <option style="background-color: white;" value="Ada_Boost">Adaboost Classifier</option>
+            <option style="background-color: white;" value="QDA">Quadratic Discriminant Analysis (QDA)</option>
+            <option style="background-color: white;" value="Linear_Discriminant_Analysis">Linear Discriminant Analysis (LDA)</option>
           </select>
         </div>
         <button type="submit" id="predict" class="btn btn-primary">
